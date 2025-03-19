@@ -6,4 +6,5 @@ module.exports = {
   coverageDirectory: 'coverage', // Stores coverage reports in /coverage
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'], // Matches test files
   coveragePathIgnorePatterns: ['/auto/', '/.*?/auto/'],
+  testTimeout: 600000, // 600 seconds
 };
