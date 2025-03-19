@@ -4,6 +4,7 @@
 
 - Extract structured **tag values** from JSON (`extractTags`).
 - Transform FOCUS records by **adding extracted tags and removing unwanted columns** (`transformLine`).
+- Aggregate FOCUS cost data **by time intervals (`daily`, `monthly`, `yearly`) and group by tags, SKUs, services, etc.** (`aggregateData`).
 - Type-safe, sandbox-friendly, and **100% test covered**.
 
 ---
@@ -17,6 +18,18 @@ npm install focus-ninja
 ### 📌 Usage
 
 Basic Examples
+
+```typescript
+import { aggregateData } from 'focus-ninja';
+
+const aggregated = aggregateData({
+  data: focusDataset, // Your parsed FOCUS dataset
+  interval: 'yearly',
+  groupBy: ['ServiceCategory'],
+});
+
+// Returns yearly aggregated cost data, grouped by ServiceCategory
+```
 
 ```typescript
 import { extractTags } from 'focus-ninja';
