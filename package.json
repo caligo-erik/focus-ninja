@@ -9,9 +9,7 @@
   "scripts": {
     "pretest": "npm run build && npm run lint && depcheck",
     "lint": "eslint src --fix",
-    "test": "jest --config jest.config.js",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "jest --config jest.config.js --coverage",
     "build": "rm -rf ./lib && tsc",
     "check": "repo-ninja version -c -e -s -v ./src/version.ts",
     "prepublishOnly": "npm run check && npm run reinstall && npm run test",
