@@ -1,0 +1,54 @@
+{
+  "name": "focus-ninja",
+  "version": "1.0.0",
+  "description": "Functions to help manipulate FOCUS data",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "pretest": "npm run build && npm run lint && depcheck",
+    "lint": "eslint src --fix",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "build": "rm -rf ./lib && tsc",
+    "check": "repo-ninja version -c -e -s -v ./src/version.ts",
+    "prepublishOnly": "npm run check && npm run reinstall && npm run test",
+    "reinstall": "repo-ninja reinstall",
+    "beta": "repo-ninja beta-tag",
+    "patch": "repo-ninja version-bump patch",
+    "minor": "repo-ninja version-bump minor",
+    "major": "repo-ninja version-bump major",
+    "cleanBranches:dry": "repo-ninja clean-local-branches --dry-run",
+    "cleanBranches": "repo-ninja clean-local-branches"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caligo-erik/focus-ninja.git"
+  },
+  "keywords": [],
+  "author": "Erik Norman",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/caligo-erik/focus-ninja/issues"
+  },
+  "homepage": "https://github.com/caligo-erik/focus-ninja#readme",
+  "devDependencies": {
+    "@caligo-ninja/repo-ninja": "2.6.0",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.19.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "depcheck": "^1.4.7",
+    "eslint": "^9.19.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
