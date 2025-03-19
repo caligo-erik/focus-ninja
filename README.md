@@ -1,21 +1,14 @@
-# focus-ninja
+# 🏷️ focus-ninja
 
-Functions to help manipulate FOCUS data
+**Functions to help manipulate FinOps FOCUS data**
 
-## 🏷️ extractTags – A Simple Tag Extractor for FinOps Data
-
-`extractTags` is a lightweight TypeScript function that extracts specific tag values from a **JSON-encoded string**. If a tag is missing, it can return a fallback value.
-
-#### 🎯 **Why Use This?**
-
-- You have FinOps FOCUS data stored as JSON strings.
-- You need to extract only certain **tags** from the JSON.
-- Some tags might be missing, so you want **fallback values**.
-- You want a **simple, sandbox-safe function** (no file system or external dependencies).
+- Extract structured **tag values** from JSON (`extractTags`).
+- Transform FOCUS records by **adding extracted tags and removing unwanted columns** (`transformLine`).
+- Type-safe, sandbox-friendly, and **100% test covered**.
 
 ---
 
-### 🚀 **Installation**
+## 🚀 Installation
 
 ```sh
 npm install focus-ninja
@@ -23,7 +16,7 @@ npm install focus-ninja
 
 ### 📌 Usage
 
-Basic Example
+Basic Examples
 
 ```typescript
 import { extractTags } from 'focus-ninja';
@@ -35,4 +28,63 @@ const fallbacks = { costCenter: 'defaultCostCenter' };
 const result = extractTags(tagString, keys, fallbacks);
 console.log(result);
 // Output: { project: "FinOps", environment: "prod", costCenter: "defaultCostCenter" }
+```
+
+```typescript
+import { extractTags, transformLine, FocusLine } from 'focus-ninja';
+
+const sampleLine = (sampleLine = {
+  AvailabilityZone: null,
+  BilledCost: 0.027,
+  BillingAccountId: '1234567890123',
+  BillingAccountName: 'SunBird',
+  BillingCurrency: 'USD',
+  BillingPeriodEnd: '2024-10-01 00:00:00',
+  BillingPeriodStart: '2024-09-01 00:00:00',
+  ChargeCategory: 'Usage',
+  ChargeClass: null,
+  ChargeDescription: '$0.027 per Application LoadBalancer-hour',
+  ChargeFrequency: 'Usage-Based',
+  ChargePeriodEnd: '2024-09-17 16:00:00',
+  ChargePeriodStart: '2024-09-17 15:00:00',
+  CommitmentDiscountCategory: null,
+  CommitmentDiscountId: null,
+  CommitmentDiscountName: null,
+  CommitmentDiscountStatus: null,
+  CommitmentDiscountType: null,
+  ConsumedQuantity: 1,
+  ConsumedUnit: 'Hours',
+  ContractedCost: 0,
+  ContractedUnitPrice: 0,
+  EffectiveCost: 0,
+  InvoiceIssuerName: 'Amazon Web Services, Inc.',
+  ListCost: 0.027,
+  ListUnitPrice: '0.027',
+  PricingCategory: 'Standard',
+  PricingQuantity: 1,
+  PricingUnit: 'Hours',
+  ProviderName: 'AWS',
+  PublisherName: 'Amazon Web Services, Inc.',
+  RegionId: 'eu-central-1',
+  RegionName: 'EU (Frankfurt)',
+  ResourceId: 'arn:aws:elasticloadbalancing:eu-central-1:561134494941:app/pieto-api/7b29febfbe87',
+  ResourceName: null,
+  ResourceType: null,
+  ServiceCategory: 'Networking',
+  Id: 128,
+  ServiceName: 'Elastic Load Balancing',
+  SkuId: 'UZQQFKE5Z4MCF9D5',
+  SkuPriceId: 'UZQQFKE5Z4MCF9D5.JRTCKXETXF.6YS6EN2CT7',
+  SubAccountId: '84445137922',
+  SubAccountName: 'Pioneer Nimbus',
+  Tags: '{"application": "DynamicGuideZone", "environment": "prod", "business_unit": "KnoxvilleEngineering"}',
+});
+
+const transformedLine = transformLine({
+  line: sampleLine,
+  tagKeys: ['application', 'environment'],
+  fallbackValues: { application: 'fallbackApp' },
+  columnsToRemove: ['RegionName', 'SkuId'],
+});
+// returns the sample line with new properties for application and environment, and removes the properties Tags, RegionName, SkuId
 ```
