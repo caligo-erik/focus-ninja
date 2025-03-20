@@ -1,13 +1,9 @@
 import { FocusLine } from '../interfaces/FocusLine';
 import { AggregateDataParams } from '../interfaces/AggregateDataParams';
 import { TransformedFocusLine, transformLine } from '../transform/transformLine';
+import { safeNumber } from '../helper/safeNumber';
 
 type FocusColumn = keyof FocusLine;
-
-export const safeNumber = (value: unknown | null | undefined): number => {
-  const testValue = Number(value);
-  return typeof testValue === 'number' && !isNaN(testValue) ? testValue : 0;
-};
 
 /**
  * Aggregates FinOps FOCUS data by time intervals (`yearly`, `monthly`, `daily`) and optional grouping.
