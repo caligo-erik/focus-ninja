@@ -15,7 +15,7 @@
       "request": "launch",
       "name": "Debug Jest Tests",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
-      "args": ["--runInBand", "--config", "jest.config.js", "--no-cache", "--testNamePattern", "createSampleData"],
+      "args": ["--runInBand", "--config", "jest.config.js", "--no-cache"], //, "--testNamePattern", "createSampleData"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "env": {
