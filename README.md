@@ -5,6 +5,7 @@
 - Extract structured **tag values** from JSON (`extractTags`).
 - Transform FOCUS records by **adding extracted tags and removing unwanted columns** (`transformLine`).
 - Aggregate FOCUS cost data **by time intervals (`daily`, `monthly`, `yearly`) and group by tags, SKUs, services, etc.** (`aggregateData`).
+- Create sample FOCUS data with hourly granularity
 - Type-safe, sandbox-friendly, and **100% test covered**.
 
 ---
@@ -41,6 +42,16 @@ const fallbacks = { costCenter: 'defaultCostCenter' };
 const result = extractTags(tagString, keys, fallbacks);
 console.log(result);
 // Output: { project: "FinOps", environment: "prod", costCenter: "defaultCostCenter" }
+```
+
+```typescript
+// Note the separate import to avoid bloating the import size of the other functions
+import { createSampleData } from 'focus-ninja/sampleData';
+
+const year = 2022;
+const month = 5;
+const day = 3;
+const sampleData = createSampleData(year, month, day, 10000);
 ```
 
 ```typescript
