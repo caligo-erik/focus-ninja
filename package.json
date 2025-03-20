@@ -6,6 +6,10 @@
   "files": [
     "lib"
   ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./sampleData": "./lib/sampleData/createSampleData.js"
+  },
   "scripts": {
     "pretest": "npm run build && npm run lint && depcheck",
     "lint": "eslint src --fix",
