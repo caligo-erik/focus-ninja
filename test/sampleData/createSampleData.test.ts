@@ -1,3 +1,4 @@
+import { aggregateData } from '../../src/aggregate/aggregateData';
 import { createSampleData } from '../../src/sampleData/createSampleData';
 
 describe('createSampleData tests', () => {
@@ -51,5 +52,19 @@ describe('createSampleData tests', () => {
 
     // ✅ Ensure all 24 hours (0-23) are represented
     expect(seenHours.size).toBe(24);
+  });
+
+  test('create sample data and aggregate it by CostCenter', () => {
+    const year = 2022;
+    const month = 5;
+    const day = 3;
+    const sampleData = createSampleData(year, month, day, 10000);
+
+    const aggregated = aggregateData({
+      data: sampleData,
+      groupBy: ['CostCenter'],
+    });
+
+    expect(aggregated).not.toBeNull();
   });
 });
