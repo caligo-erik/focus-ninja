@@ -66,9 +66,9 @@ export function aggregateData(params: AggregateDataParams) {
       return transformedLine[col as keyof TransformedFocusLine];
     });
 
-    const key = [year, month, day, ...groupValues].join('\x1E');
+    const groupKey = [year, month, day, ...groupValues].join('\x1E');
 
-    let group = groupedData.get(key);
+    let group = groupedData.get(groupKey);
 
     if (!group) {
       group = {
@@ -76,11 +76,12 @@ export function aggregateData(params: AggregateDataParams) {
         month: interval === 'monthly' || interval === 'daily' ? month : undefined,
         day: interval === 'daily' ? day : undefined,
         ...Object.fromEntries(groupBy.map((col, index) => [col, groupValues[index]])),
+        GroupKey: groupKey, // ✅ Add the grouping key
         TotalBilledCost: 0,
         TotalEffectiveCost: 0,
         TotalConsumedQuantity: 0,
       };
-      groupedData.set(key, group);
+      groupedData.set(groupKey, group);
     }
 
     group.TotalBilledCost += safeNumber(transformedLine.BilledCost);

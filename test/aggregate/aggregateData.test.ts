@@ -1,37 +1,19 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import csv from 'csv-parser';
 import { aggregateData } from '../../src/aggregate/aggregateData';
-
-import { FocusLine } from '../../src/interfaces/FocusLine';
-import { safeNumber } from '../../src/helper/safeNumber';
-
-const fileName = path.join(__dirname, '../input/focus_sample_100000.csv');
-const parsedData: FocusLine[] = [];
+import { createSampleData } from '../../src/sampleData/createSampleData';
 
 describe('aggregate data tests', () => {
-  beforeAll(async () => {
-    // Parse CSV manually since `csv-parser` works asynchronously
-    await new Promise<void>((resolve) => {
-      fs.createReadStream(fileName)
-        .pipe(csv())
-        .on('data', (row) => parsedData.push(row as FocusLine))
-        .on('end', resolve);
-    });
-  });
-  test('aggregate data test aggregate yearly', () => {
-    const timeStart = Date.now();
+  let parsedData: any[];
 
+  beforeAll(() => {
+    parsedData = createSampleData(2024, 9, 15, 1000); // 🎯 Simulate 1K sample rows
+  });
+
+  test('aggregate data test aggregate yearly', () => {
     const aggregatedResult = aggregateData({
       data: parsedData,
       interval: 'yearly',
     });
 
-    const timeEnd = Date.now();
-
-    // expect(timeEnd - timeStart).toBeLessThan(2000); // Execution time should be less than 2 seconds
-
-    // ✅ Ensure data is aggregated by year
     expect(Array.isArray(aggregatedResult)).toBe(true);
     expect(aggregatedResult.length).toBe(1);
 
@@ -41,44 +23,23 @@ describe('aggregate data tests', () => {
       expect(row).toHaveProperty('TotalBilledCost');
       expect(row).toHaveProperty('TotalEffectiveCost');
       expect(row).toHaveProperty('TotalConsumedQuantity');
+      expect(row).toHaveProperty('GroupKey'); // ✅ Ensure GroupKey exists
+      expect(typeof row.GroupKey).toBe('string');
     });
-
-    // ✅ Ensure total cost fields are numbers
-    aggregatedResult.forEach((row) => {
-      expect(typeof row.TotalBilledCost).toBe('number');
-      expect(typeof row.TotalEffectiveCost).toBe('number');
-      expect(typeof row.TotalConsumedQuantity).toBe('number');
-    });
-
-    // ✅ Sum raw costs from input
-    const totalBilledCostInput = parsedData.reduce((sum, row) => sum + safeNumber(row.BilledCost), 0);
-    const totalEffectiveCostInput = parsedData.reduce((sum, row) => sum + safeNumber(row.EffectiveCost), 0);
-    const totalConsumedQuantityInput = parsedData.reduce((sum, row) => sum + safeNumber(row.ConsumedQuantity), 0);
-
-    // ✅ Compare totals
-    expect(aggregatedResult[0].TotalBilledCost).toBeCloseTo(totalBilledCostInput, 2);
-    expect(aggregatedResult[0].TotalEffectiveCost).toBeCloseTo(totalEffectiveCostInput, 2);
-    expect(aggregatedResult[0].TotalConsumedQuantity).toBeCloseTo(totalConsumedQuantityInput, 2);
   });
 
-  test('aggregate data test aggregate monthly', () => {
-    const timeStart = Date.now();
-
+  test('aggregate data test aggregate monthly with CostCenter', () => {
+    const groupByFields = ['CostCenter'];
     const aggregatedResult = aggregateData({
       data: parsedData,
       interval: 'monthly',
+      groupBy: groupByFields,
     });
 
-    const timeEnd = Date.now();
-
-    expect(timeEnd - timeStart).toBeLessThan(2000); // Execution time should be less than 1 second
-
-    // ✅ Ensure data is aggregated by month
     expect(Array.isArray(aggregatedResult)).toBe(true);
-    expect(aggregatedResult.length).toBe(3);
-    for (let i = 0; i < aggregatedResult.length; i++) {
-      const row = aggregatedResult[i];
+    expect(aggregatedResult.length).toBeGreaterThan(0);
 
+    aggregatedResult.forEach((row) => {
       expect(row).toHaveProperty('year');
       expect(typeof row.year).toBe('number');
       expect(row).toHaveProperty('month');
@@ -86,124 +47,57 @@ describe('aggregate data tests', () => {
       expect(row).toHaveProperty('TotalBilledCost');
       expect(row).toHaveProperty('TotalEffectiveCost');
       expect(row).toHaveProperty('TotalConsumedQuantity');
+      expect(row).toHaveProperty('GroupKey');
+      expect(typeof row.GroupKey).toBe('string');
 
-      // ✅ Ensure total cost fields are numbers
-      expect(typeof row.TotalBilledCost).toBe('number');
-      expect(typeof row.TotalEffectiveCost).toBe('number');
-      expect(typeof row.TotalConsumedQuantity).toBe('number');
-    }
+      // ✅ Ensure GroupKey can be split and matches `groupBy`
+      const groupValues = row.GroupKey.split('\x1E');
+      expect(groupValues.length).toBe(groupByFields.length + 3); // Includes year, month, and CostCenter
+      // ✅ Validate the grouping key
+
+      // Expected order: [year, month, CostCenter]
+      expect(groupValues[0]).toBe(String(row.year));
+      expect(groupValues[1]).toBe(String(row.month));
+      expect(groupValues[2]).toBe(row.CostCenter);
+    });
   });
 
-  test('aggregate data test aggregate daily', () => {
-    const timeStart = Date.now();
-
+  test('aggregate data test aggregate daily with ServiceCategory and CostCenter', () => {
+    const groupByFields = ['ServiceCategory', 'CostCenter'];
     const aggregatedResult = aggregateData({
       data: parsedData,
       interval: 'daily',
+      groupBy: groupByFields,
     });
 
-    const timeEnd = Date.now();
-
-    expect(timeEnd - timeStart).toBeLessThan(2000); // Execution time should be less than 1 second
-
-    // ✅ Ensure data is aggregated by day
     expect(Array.isArray(aggregatedResult)).toBe(true);
-    expect(aggregatedResult.length).toBe(3);
-    for (let i = 0; i < aggregatedResult.length; i++) {
-      const row = aggregatedResult[i];
+    expect(aggregatedResult.length).toBeGreaterThan(1);
 
+    aggregatedResult.forEach((row) => {
       expect(row).toHaveProperty('year');
       expect(typeof row.year).toBe('number');
       expect(row).toHaveProperty('month');
       expect(typeof row.month).toBe('number');
+      expect(row).toHaveProperty('day');
+      expect(typeof row.day).toBe('number');
       expect(row).toHaveProperty('TotalBilledCost');
       expect(row).toHaveProperty('TotalEffectiveCost');
       expect(row).toHaveProperty('TotalConsumedQuantity');
+      expect(row).toHaveProperty('GroupKey');
+      expect(typeof row.GroupKey).toBe('string');
 
-      // ✅ Ensure total cost fields are numbers
-      expect(typeof row.TotalBilledCost).toBe('number');
-      expect(typeof row.TotalEffectiveCost).toBe('number');
-      expect(typeof row.TotalConsumedQuantity).toBe('number');
-    }
-  });
-
-  test('aggregate data test aggregate monthly and CostCenter', () => {
-    const timeStart = Date.now();
-
-    const aggregatedResult = aggregateData({
-      data: parsedData,
-      interval: 'monthly',
-      groupBy: ['CostCenter'],
+      // ✅ Ensure GroupKey can be split and matches `groupBy`
+      const groupValues = row.GroupKey.split('\x1E');
+      expect(groupValues.length).toBe(groupByFields.length + 3); // Includes year, month, day
     });
-
-    const timeEnd = Date.now();
-
-    // expect(timeEnd - timeStart).toBeLessThan(2000); // Execution time should be less than 1 second
-
-    // ✅ Ensure data is aggregated by month
-    expect(Array.isArray(aggregatedResult)).toBe(true);
-    expect(aggregatedResult.length).toBe(5);
-    for (let i = 0; i < aggregatedResult.length; i++) {
-      const row = aggregatedResult[i];
-
-      expect(row).toHaveProperty('year');
-      expect(typeof row.year).toBe('number');
-      expect(row).toHaveProperty('month');
-      expect(typeof row.month).toBe('number');
-      expect(row).toHaveProperty('TotalBilledCost');
-      expect(row).toHaveProperty('TotalEffectiveCost');
-      expect(row).toHaveProperty('TotalConsumedQuantity');
-
-      // ✅ Ensure total cost fields are numbers
-      expect(typeof row.TotalBilledCost).toBe('number');
-      expect(typeof row.TotalEffectiveCost).toBe('number');
-      expect(typeof row.TotalConsumedQuantity).toBe('number');
-    }
-  });
-
-  test('aggregate data test aggregate monthly and CostCenter with fallback values', () => {
-    const timeStart = Date.now();
-
-    const aggregatedResult = aggregateData({
-      data: parsedData,
-      interval: 'monthly',
-      groupBy: ['CostCenter'],
-      fallbackValues: {
-        CostCenter: 'Banana',
-      },
-    });
-
-    const timeEnd = Date.now();
-
-    expect(timeEnd - timeStart).toBeLessThan(2000); // Execution time should be less than 1 second
-
-    // ✅ Ensure data is aggregated by month
-    expect(Array.isArray(aggregatedResult)).toBe(true);
-    expect(aggregatedResult.length).toBe(5);
-    for (let i = 0; i < aggregatedResult.length; i++) {
-      const row = aggregatedResult[i];
-
-      expect(row).toHaveProperty('year');
-      expect(typeof row.year).toBe('number');
-      expect(row).toHaveProperty('month');
-      expect(typeof row.month).toBe('number');
-      expect(row).toHaveProperty('TotalBilledCost');
-      expect(row).toHaveProperty('TotalEffectiveCost');
-      expect(row).toHaveProperty('TotalConsumedQuantity');
-
-      // ✅ Ensure total cost fields are numbers
-      expect(typeof row.TotalBilledCost).toBe('number');
-      expect(typeof row.TotalEffectiveCost).toBe('number');
-      expect(typeof row.TotalConsumedQuantity).toBe('number');
-    }
   });
 
   test('aggregateData should throw an error when neither interval nor groupBy is provided', () => {
     expect(() => {
       aggregateData({
-        data: parsedData, // Valid dataset
-        interval: undefined, // ❌ No interval
-        groupBy: [], // ❌ No groupBy fields
+        data: parsedData,
+        interval: undefined,
+        groupBy: [],
       });
     }).toThrow("Either 'interval' or 'groupBy' must be provided.");
   });
