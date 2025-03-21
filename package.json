@@ -38,7 +38,6 @@
   },
   "homepage": "https://github.com/caligo-erik/focus-ninja#readme",
   "devDependencies": {
-    "@caligo-ninja/repo-ninja": "2.6.0",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.19.0",
     "@types/jest": "^29.5.14",
@@ -49,6 +48,7 @@
     "eslint": "^9.19.0",
     "eslint-plugin-unused-imports": "^4.1.4",
     "jest": "^29.7.0",
+    "repo-ninja": "^2.7.1",
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"

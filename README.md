@@ -112,3 +112,7 @@ const transformedLine = transformLine({
 });
 // returns the sample line with new properties for application and environment, and removes the properties Tags, RegionName, SkuId
 ```
+
+## 📌 **Contributing**
+
+Want to improve `focus-ninja`? Check out our [contribution guide!](CONTRIBUTING.md) 🚀
