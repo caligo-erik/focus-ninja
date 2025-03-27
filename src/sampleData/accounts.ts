@@ -1,7 +1,6 @@
 import { Account } from '../interfaces/Account';
 
 export const accounts: Account[] = [
-  new Account('Unknown', 'Unknown', 'Unknown', 'Unknown', {}),
   new Account('1234567890123', 'SunBird', '51738928782', 'Atlas Nimbus', {
     application: [
       'MaxMindInsight',

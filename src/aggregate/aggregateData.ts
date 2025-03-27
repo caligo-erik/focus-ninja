@@ -5,6 +5,38 @@ import { safeNumber } from '../helper/safeNumber';
 
 type FocusColumn = keyof FocusLine;
 
+const getTimeGroupKeys = (interval: 'daily' | 'monthly' | 'yearly' | undefined): Map<string, boolean> => {
+  const groupKeys = new Map<string, boolean>();
+  groupKeys.set('year', true);
+
+  switch (interval) {
+    case 'yearly': {
+      groupKeys.set('month', false);
+      groupKeys.set('day', false);
+      groupKeys.set('hour', false);
+      break;
+    }
+    case 'monthly': {
+      groupKeys.set('month', true);
+      groupKeys.set('day', false);
+      groupKeys.set('hour', false);
+      break;
+    }
+    case 'daily': {
+      groupKeys.set('month', true);
+      groupKeys.set('day', true);
+      groupKeys.set('hour', false);
+      break;
+    }
+    default: {
+      groupKeys.set('month', true);
+      groupKeys.set('day', true);
+      groupKeys.set('hour', true);
+    }
+  }
+  return groupKeys;
+};
+
 /**
  * Aggregates FinOps FOCUS data by time intervals (`yearly`, `monthly`, `daily`) and optional grouping.
  * Automatically extracts missing `groupBy` fields from `Tags`, ensuring complete data aggregation.
@@ -36,7 +68,6 @@ type FocusColumn = keyof FocusLine;
  * @returns An array of aggregated data objects, each representing a grouped summary.
  *          Includes computed totals (`TotalBilledCost`, `TotalEffectiveCost`, `TotalConsumedQuantity`) for each group.
  */
-
 export function aggregateData(params: AggregateDataParams) {
   const { data, interval, groupBy = [], fallbackValues = {} } = params;
 
@@ -58,9 +89,11 @@ export function aggregateData(params: AggregateDataParams) {
     }
 
     const date = new Date(line.BillingPeriodStart);
-    const year = date.getUTCFullYear();
-    const month = interval !== 'yearly' ? date.getUTCMonth() + 1 : null;
-    const day = interval === 'daily' ? date.getUTCDate() : null;
+    const timeGroupKeys = getTimeGroupKeys(interval);
+    const year = timeGroupKeys.get('year') ? date.getUTCFullYear() : undefined;
+    const month = timeGroupKeys.get('month') ? date.getUTCMonth() + 1 : undefined;
+    const day = timeGroupKeys.get('day') ? date.getUTCDate() : undefined;
+    const hour = timeGroupKeys.get('hour') ? date.getUTCHours() : undefined;
 
     const groupValues = groupBy.map((col) => {
       return transformedLine[col as keyof TransformedFocusLine];
@@ -73,8 +106,9 @@ export function aggregateData(params: AggregateDataParams) {
     if (!group) {
       group = {
         year,
-        month: interval === 'monthly' || interval === 'daily' ? month : undefined,
-        day: interval === 'daily' ? day : undefined,
+        month,
+        day,
+        hour,
         ...Object.fromEntries(groupBy.map((col, index) => [col, groupValues[index]])),
         GroupKey: groupKey, // ✅ Add the grouping key
         TotalBilledCost: 0,
