@@ -100,6 +100,7 @@ export function aggregateData(params: AggregateDataParams) {
     });
 
     const groupKey = [year, month, day, hour, ...groupValues].join('\x1E');
+    const globalGroupKey = groupValues.join('\x1E');
 
     let group = groupedData.get(groupKey);
 
@@ -111,6 +112,7 @@ export function aggregateData(params: AggregateDataParams) {
         hour,
         ...Object.fromEntries(groupBy.map((col, index) => [col, groupValues[index]])),
         GroupKey: groupKey, // ✅ Add the grouping key
+        GlobalGroupKey: globalGroupKey, // ✅ Add the global grouping key
         TotalBilledCost: 0,
         TotalEffectiveCost: 0,
         TotalConsumedQuantity: 0,
