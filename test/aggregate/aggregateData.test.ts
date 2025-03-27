@@ -28,6 +28,34 @@ describe('aggregate data tests', () => {
     });
   });
 
+  test('aggregate data test aggregate hourly by ResourceName', () => {
+    const aggregatedResult = aggregateData({
+      data: parsedData,
+      groupBy: ['ResourceName'],
+    });
+
+    expect(Array.isArray(aggregatedResult)).toBe(true);
+    expect(aggregatedResult.length).toBeGreaterThan(1);
+
+    aggregatedResult.forEach((row) => {
+      expect(row).toHaveProperty('year');
+      expect(typeof row.year).toBe('number');
+      expect(row).toHaveProperty('month');
+      expect(typeof row.month).toBe('number');
+      expect(row).toHaveProperty('day');
+      expect(typeof row.day).toBe('number');
+      expect(row).toHaveProperty('hour');
+      expect(typeof row.hour).toBe('number');
+      expect(row).toHaveProperty('TotalBilledCost');
+      expect(row).toHaveProperty('TotalEffectiveCost');
+      expect(row).toHaveProperty('TotalConsumedQuantity');
+      expect(row).toHaveProperty('GroupKey'); // ✅ Ensure GroupKey exists
+      expect(typeof row.GroupKey).toBe('string');
+      expect(row).toHaveProperty('ResourceName'); // ✅ Ensure ResourceName exists
+      expect(typeof row.ResourceName).toBe('string');
+    });
+  });
+
   test('aggregate data test aggregate monthly with CostCenter', () => {
     const groupByFields = ['CostCenter'];
     const aggregatedResult = aggregateData({
