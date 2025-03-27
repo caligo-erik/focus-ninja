@@ -80,7 +80,7 @@ describe('aggregate data tests', () => {
 
       // ✅ Ensure GroupKey can be split and matches `groupBy`
       const groupValues = row.GroupKey.split('\x1E');
-      expect(groupValues.length).toBe(groupByFields.length + 3); // Includes year, month, and CostCenter
+      expect(groupValues.length).toBe(groupByFields.length + 4); // Includes year, month, day, and CostCenter
       // ✅ Validate the grouping key
 
       // Expected order: [year, month, CostCenter]
@@ -116,7 +116,7 @@ describe('aggregate data tests', () => {
 
       // ✅ Ensure GroupKey can be split and matches `groupBy`
       const groupValues = row.GroupKey.split('\x1E');
-      expect(groupValues.length).toBe(groupByFields.length + 3); // Includes year, month, day
+      expect(groupValues.length).toBe(groupByFields.length + 4); // Includes year, month, day, and hour
     });
   });
 
