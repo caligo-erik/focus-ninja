@@ -5,7 +5,7 @@ describe('aggregate data tests', () => {
   let parsedData: any[];
 
   beforeAll(() => {
-    parsedData = createSampleData(2024, 9, 15, 1000); // 🎯 Simulate 1K sample rows
+    parsedData = createSampleData(2024, 9, 15, 10000); // 🎯 Simulate 1K sample rows
   });
 
   test('aggregate data test aggregate yearly', () => {
@@ -28,10 +28,10 @@ describe('aggregate data tests', () => {
     });
   });
 
-  test('aggregate data test aggregate hourly by ResourceName', () => {
+  test('aggregate data test aggregate hourly by application', () => {
     const aggregatedResult = aggregateData({
       data: parsedData,
-      groupBy: ['ResourceName'],
+      groupBy: ['application'],
     });
 
     expect(Array.isArray(aggregatedResult)).toBe(true);
@@ -51,8 +51,8 @@ describe('aggregate data tests', () => {
       expect(row).toHaveProperty('TotalConsumedQuantity');
       expect(row).toHaveProperty('GroupKey'); // ✅ Ensure GroupKey exists
       expect(typeof row.GroupKey).toBe('string');
-      expect(row).toHaveProperty('ResourceName'); // ✅ Ensure ResourceName exists
-      expect(typeof row.ResourceName).toBe('string');
+      expect(row).toHaveProperty('application'); // ✅ Ensure application exists
+      expect(typeof row.application).toBe('string');
     });
   });
 
