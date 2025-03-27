@@ -99,7 +99,7 @@ export function aggregateData(params: AggregateDataParams) {
       return transformedLine[col as keyof TransformedFocusLine];
     });
 
-    const groupKey = [year, month, day, ...groupValues].join('\x1E');
+    const groupKey = [year, month, day, hour, ...groupValues].join('\x1E');
 
     let group = groupedData.get(groupKey);
 
