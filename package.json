@@ -1,6 +1,6 @@
 {
   "name": "focus-ninja",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Functions to help manipulate FOCUS data",
   "main": "lib/index.js",
   "files": [
