@@ -1,11 +1,20 @@
+import bigDecimal from 'js-big-decimal';
 import { aggregateData } from '../../src/aggregate/aggregateData';
 import { createSampleData } from '../../src/sampleData/createSampleData';
+import { FocusLine } from '../../src/interfaces/FocusLine';
+
+const sumWithPrecision = (data: FocusLine[], field: keyof FocusLine): bigDecimal => {
+  return data.reduce((acc, row) => {
+    const val = new bigDecimal(row[field] as string);
+    return acc.add(val);
+  }, new bigDecimal(0));
+};
 
 describe('aggregate data tests', () => {
   let parsedData: any[];
 
   beforeAll(() => {
-    parsedData = createSampleData(2024, 9, 15, 10000); // 🎯 Simulate 1K sample rows
+    parsedData = createSampleData(2024, 9, 15, 10000); // 🎯 Simulate 10K sample rows
   });
 
   test('aggregate data test aggregate yearly', () => {
@@ -17,15 +26,56 @@ describe('aggregate data tests', () => {
     expect(Array.isArray(aggregatedResult)).toBe(true);
     expect(aggregatedResult.length).toBe(1);
 
-    aggregatedResult.forEach((row) => {
-      expect(row).toHaveProperty('year');
-      expect(typeof row.year).toBe('number');
-      expect(row).toHaveProperty('TotalBilledCost');
-      expect(row).toHaveProperty('TotalEffectiveCost');
-      expect(row).toHaveProperty('TotalConsumedQuantity');
-      expect(row).toHaveProperty('GroupKey'); // ✅ Ensure GroupKey exists
-      expect(typeof row.GroupKey).toBe('string');
+    const row = aggregatedResult[0];
+
+    // ✅ Field existence checks
+    expect(row).toHaveProperty('year');
+    expect(typeof row.year).toBe('number');
+    expect(row).toHaveProperty('TotalBilledCost');
+    expect(row).toHaveProperty('TotalEffectiveCost');
+    expect(row).toHaveProperty('TotalConsumedQuantity');
+    expect(row).toHaveProperty('GroupKey');
+    expect(typeof row.GroupKey).toBe('string');
+
+    // ✅ Precision check using js-big-decimal
+    const expectedBilled = sumWithPrecision(parsedData, 'BilledCost').getValue();
+    const expectedEffective = sumWithPrecision(parsedData, 'EffectiveCost').getValue();
+    const expectedConsumed = sumWithPrecision(parsedData, 'ConsumedQuantity').getValue();
+
+    expect(row.TotalBilledCost).toBe(expectedBilled);
+    expect(row.TotalEffectiveCost).toBe(expectedEffective);
+    expect(row.TotalConsumedQuantity).toBe(expectedConsumed);
+  });
+
+  test('aggregate data test aggregate yearly with rounding to 10 decimal places', () => {
+    const aggregatedResult = aggregateData({
+      data: parsedData,
+      interval: 'yearly',
+      round: 10, // ✅ Rounding enabled
     });
+
+    expect(Array.isArray(aggregatedResult)).toBe(true);
+    expect(aggregatedResult.length).toBe(1);
+
+    const row = aggregatedResult[0];
+
+    // ✅ Field existence checks
+    expect(row).toHaveProperty('year');
+    expect(typeof row.year).toBe('number');
+    expect(row).toHaveProperty('TotalBilledCost');
+    expect(row).toHaveProperty('TotalEffectiveCost');
+    expect(row).toHaveProperty('TotalConsumedQuantity');
+    expect(row).toHaveProperty('GroupKey');
+    expect(typeof row.GroupKey).toBe('string');
+
+    // ✅ Precision check using js-big-decimal with rounding
+    const expectedBilled = sumWithPrecision(parsedData, 'BilledCost').round(10).getValue();
+    const expectedEffective = sumWithPrecision(parsedData, 'EffectiveCost').round(10).getValue();
+    const expectedConsumed = sumWithPrecision(parsedData, 'ConsumedQuantity').round(10).getValue();
+
+    expect(row.TotalBilledCost).toBe(expectedBilled);
+    expect(row.TotalEffectiveCost).toBe(expectedEffective);
+    expect(row.TotalConsumedQuantity).toBe(expectedConsumed);
   });
 
   test('aggregate data test aggregate hourly by application', () => {

@@ -7,6 +7,7 @@
 - Aggregate FOCUS cost data **by time intervals (`daily`, `monthly`, `yearly`) and group by tags, SKUs, services, etc.** (`aggregateData`).
 - Create sample FOCUS data with hourly granularity
 - Type-safe, sandbox-friendly, and **100% test covered**.
+- Uses [js-big-decimal](https://www.npmjs.com/package/js-big-decimal) so you no longer have to keep wondering why $0.10 + $0.20 equals bankruptcy 😅
 
 ---
 
@@ -26,10 +27,11 @@ import { aggregateData } from 'focus-ninja';
 const aggregated = aggregateData({
   data: focusDataset, // Your parsed FOCUS dataset
   interval: 'yearly',
-  groupBy: ['ServiceCategory'],
+  groupBy: ['ServiceCategory', 'CostCenter'], // you can also group by tags directly, in this case: CostCenter
+  round: 10, // (optional) round up the aggregated data to 10 decimal places
 });
 
-// Returns yearly aggregated cost data, grouped by ServiceCategory
+// Returns yearly aggregated cost data, grouped by ServiceCategory and CostCenter
 ```
 
 ```typescript

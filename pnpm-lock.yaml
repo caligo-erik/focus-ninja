@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      js-big-decimal:
+        specifier: ^2.2.0
+        version: 2.2.0
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.2.0
@@ -1219,6 +1223,9 @@ packages:
     peerDependenciesMeta:
       node-notifier:
         optional: true
+
+  js-big-decimal@2.2.0:
+    resolution: {integrity: sha512-qJFDTcgBGvuPzsck0jNm1puKvJQ3AL8J3bIyrvF1KfsbljOVj8N/o9Kbr8RXlBx1J8aapcRpMCiG6h1l6QgYhQ==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -3321,6 +3328,8 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
+
+  js-big-decimal@2.2.0: {}
 
   js-tokens@4.0.0: {}
 
