@@ -40,7 +40,7 @@ describe('aggregate data tests', () => {
     // ✅ Precision check using js-big-decimal
     const expectedBilled = sumWithPrecision(parsedData, 'BilledCost').getValue();
     const expectedEffective = sumWithPrecision(parsedData, 'EffectiveCost').getValue();
-    const expectedConsumed = sumWithPrecision(parsedData, 'ConsumedQuantity').getValue();
+    const expectedConsumed = sumWithPrecision(parsedData, 'ConsumedQuantity').round().getValue();
 
     expect(row.TotalBilledCost).toBe(expectedBilled);
     expect(row.TotalEffectiveCost).toBe(expectedEffective);
@@ -71,7 +71,7 @@ describe('aggregate data tests', () => {
     // ✅ Precision check using js-big-decimal with rounding
     const expectedBilled = sumWithPrecision(parsedData, 'BilledCost').round(10).getValue();
     const expectedEffective = sumWithPrecision(parsedData, 'EffectiveCost').round(10).getValue();
-    const expectedConsumed = sumWithPrecision(parsedData, 'ConsumedQuantity').round(10).getValue();
+    const expectedConsumed = sumWithPrecision(parsedData, 'ConsumedQuantity').round().getValue();
 
     expect(row.TotalBilledCost).toBe(expectedBilled);
     expect(row.TotalEffectiveCost).toBe(expectedEffective);

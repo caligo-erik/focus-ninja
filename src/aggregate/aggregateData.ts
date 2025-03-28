@@ -132,14 +132,13 @@ export function aggregateData(params: AggregateDataParams) {
     if (round !== undefined) {
       rounded.TotalBilledCost = group.TotalBilledCost.round(round).getValue();
       rounded.TotalEffectiveCost = group.TotalEffectiveCost.round(round).getValue();
-      rounded.TotalConsumedQuantity = group.TotalConsumedQuantity.round(round).getValue();
     } else {
       // Default: full precision
       rounded.TotalBilledCost = group.TotalBilledCost.getValue();
       rounded.TotalEffectiveCost = group.TotalEffectiveCost.getValue();
-      rounded.TotalConsumedQuantity = group.TotalConsumedQuantity.getValue();
     }
-
+    // consumed quantity is an integer
+    rounded.TotalConsumedQuantity = group.TotalConsumedQuantity.round().getValue();
     return rounded;
   });
 }
