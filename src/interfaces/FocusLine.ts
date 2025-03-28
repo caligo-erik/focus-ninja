@@ -1,6 +1,6 @@
 export interface FocusLine {
   AvailabilityZone: string | null;
-  BilledCost: number;
+  BilledCost: number | string;
   BillingAccountId: string;
   BillingAccountName: string;
   BillingCurrency: string;
@@ -21,9 +21,9 @@ export interface FocusLine {
   ConsumedUnit: string;
   ContractedCost: number;
   ContractedUnitPrice: number;
-  EffectiveCost: number;
+  EffectiveCost: number | string;
   InvoiceIssuerName: string;
-  ListCost: number;
+  ListCost: number | string;
   ListUnitPrice: string;
   PricingCategory: string;
   PricingQuantity: number;

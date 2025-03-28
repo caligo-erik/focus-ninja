@@ -1,7 +1,7 @@
 import { FocusLine } from '../interfaces/FocusLine';
 import { AggregateDataParams } from '../interfaces/AggregateDataParams';
 import { TransformedFocusLine, transformLine } from '../transform/transformLine';
-import { safeNumber } from '../helper/safeNumber';
+import bigDecimal from 'js-big-decimal';
 
 type FocusColumn = keyof FocusLine;
 
@@ -69,7 +69,7 @@ const getTimeGroupKeys = (interval: 'daily' | 'monthly' | 'yearly' | undefined):
  *          Includes computed totals (`TotalBilledCost`, `TotalEffectiveCost`, `TotalConsumedQuantity`) for each group.
  */
 export function aggregateData(params: AggregateDataParams) {
-  const { data, interval, groupBy = [], fallbackValues = {} } = params;
+  const { data, interval, groupBy = [], fallbackValues = {}, round = undefined } = params;
 
   if (!interval && groupBy.length === 0) {
     throw new Error("Either 'interval' or 'groupBy' must be provided.");
@@ -90,7 +90,8 @@ export function aggregateData(params: AggregateDataParams) {
 
     const date = new Date(line.BillingPeriodStart);
     const timeGroupKeys = getTimeGroupKeys(interval);
-    const year = timeGroupKeys.get('year') ? date.getUTCFullYear() : undefined;
+    // year is always defined, so it's always included in the grouping key.
+    const year = date.getUTCFullYear();
     const month = timeGroupKeys.get('month') ? date.getUTCMonth() + 1 : undefined;
     const day = timeGroupKeys.get('day') ? date.getUTCDate() : undefined;
     const hour = timeGroupKeys.get('hour') ? date.getUTCHours() : undefined;
@@ -113,17 +114,32 @@ export function aggregateData(params: AggregateDataParams) {
         ...Object.fromEntries(groupBy.map((col, index) => [col, groupValues[index]])),
         GroupKey: groupKey, // ✅ Add the grouping key
         GlobalGroupKey: globalGroupKey, // ✅ Add the global grouping key
-        TotalBilledCost: 0,
-        TotalEffectiveCost: 0,
-        TotalConsumedQuantity: 0,
+        TotalBilledCost: new bigDecimal(0),
+        TotalEffectiveCost: new bigDecimal(0),
+        TotalConsumedQuantity: new bigDecimal(0),
       };
       groupedData.set(groupKey, group);
     }
 
-    group.TotalBilledCost += safeNumber(transformedLine.BilledCost);
-    group.TotalEffectiveCost += safeNumber(transformedLine.EffectiveCost);
-    group.TotalConsumedQuantity += safeNumber(transformedLine.ConsumedQuantity);
+    group.TotalBilledCost = group.TotalBilledCost.add(new bigDecimal(transformedLine.BilledCost));
+    group.TotalEffectiveCost = group.TotalEffectiveCost.add(new bigDecimal(transformedLine.EffectiveCost));
+    group.TotalConsumedQuantity = group.TotalConsumedQuantity.add(new bigDecimal(transformedLine.ConsumedQuantity));
   }
 
-  return Array.from(groupedData.values());
+  return Array.from(groupedData.values()).map((group) => {
+    const rounded = { ...group };
+
+    if (round !== undefined) {
+      rounded.TotalBilledCost = group.TotalBilledCost.round(round).getValue();
+      rounded.TotalEffectiveCost = group.TotalEffectiveCost.round(round).getValue();
+      rounded.TotalConsumedQuantity = group.TotalConsumedQuantity.round(round).getValue();
+    } else {
+      // Default: full precision
+      rounded.TotalBilledCost = group.TotalBilledCost.getValue();
+      rounded.TotalEffectiveCost = group.TotalEffectiveCost.getValue();
+      rounded.TotalConsumedQuantity = group.TotalConsumedQuantity.getValue();
+    }
+
+    return rounded;
+  });
 }

@@ -4,6 +4,7 @@ import { Account } from '../interfaces/Account';
 import { skus } from './skus';
 import { accounts } from './accounts';
 import { getName } from './names';
+import bigDecimal from 'js-big-decimal';
 
 // Function to generate a **simple** random ResourceId
 function generateResourceId(): string {
@@ -72,7 +73,7 @@ export function createFocusLine(year: number, month: number, day: number, hour: 
   const consumedQuantity = Math.floor(Math.random() * (max - min + 1)) + min;
 
   // 🎯 5️⃣ Calculate Costs
-  const billedCost = consumedQuantity * sku.ListUnitPrice;
+  const billedCost = bigDecimal.multiply(consumedQuantity, sku.ListUnitPrice);
   const effectiveCost = billedCost; // No discounts for now
   const listCost = billedCost; // Same as billed cost for now
   const contractedCost = 0; // Placeholder
