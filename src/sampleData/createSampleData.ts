@@ -73,7 +73,10 @@ export function createFocusLine(year: number, month: number, day: number, hour: 
   const consumedQuantity = Math.floor(Math.random() * (max - min + 1)) + min;
 
   // 🎯 5️⃣ Calculate Costs
-  const billedCost = bigDecimal.multiply(consumedQuantity, sku.ListUnitPrice);
+  let billedCost = bigDecimal.multiply(consumedQuantity, sku.ListUnitPrice);
+  if (bigDecimal.compareTo(billedCost, "0") < 0) {
+    billedCost = "0";
+  }
   const effectiveCost = billedCost; // No discounts for now
   const listCost = billedCost; // Same as billed cost for now
   const contractedCost = 0; // Placeholder
