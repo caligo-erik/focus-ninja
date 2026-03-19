@@ -1,6 +1,0 @@
-ignoreDirs: ['lib']
-
-ignores:
-  - '@types/jest'
-  - '@types/node'
-  - ts-node
