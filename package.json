@@ -11,12 +11,13 @@
     "./sampleData": "./lib/sampleData/createSampleData.js"
   },
   "scripts": {
-    "pretest": "npm run build && npm run lint",
+    "tsc": "tsc -p tsconfig.json",
+    "pretest": "pnpm run build && pnpm run lint",
     "lint": "eslint src --fix",
     "test": "jest --config jest.config.js --coverage",
-    "build": "rm -rf ./lib && tsc",
+    "build": "rm -rf ./lib && pnpm run tsc",
     "check": "repo-ninja version -c -e -s -v ./src/version.ts",
-    "prepublishOnly": "npm run check && npm run reinstall && npm run test",
+    "prepublishOnly": "pnpm run check && pnpm run reinstall && pnpm run test",
     "reinstall": "repo-ninja reinstall",
     "beta": "repo-ninja beta-tag",
     "patch": "repo-ninja version-bump patch",
@@ -38,22 +39,22 @@
   },
   "homepage": "https://github.com/caligo-erik/focus-ninja#readme",
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.6.0",
-    "@typescript-eslint/eslint-plugin": "^8.58.2",
-    "@typescript-eslint/parser": "^8.58.2",
-    "eslint": "^10.2.1",
-    "eslint-plugin-unused-imports": "^4.4.1",
-    "jest": "^30.3.0",
+    "@types/node": "^26.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.51.0",
+    "@typescript-eslint/parser": "^8.51.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "jest": "^30.4.2",
     "repo-ninja": "^2.7.2",
-    "ts-jest": "^29.4.9",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "js-big-decimal": "^2.2.0"
   },
-  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
+  "packageManager": "pnpm@11.15.1"
 }
